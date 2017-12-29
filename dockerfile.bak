@@ -1,8 +1,9 @@
 FROM ubuntu:16.04
 RUN apt-get update 
-RUN apt-get install apt-utils tar sudo wget unzip curl lsof maven openjdk-8-jdk openjdk-8-jre git make automake autoconf libtool  patch libx11-dev libxt-dev pkg-config texinfo locales-all ant hostname -y
+RUN apt-get install apt-utils tar sudo wget unzip curl maven openjdk-8-jdk openjdk-8-jre git make automake autoconf libtool  patch libx11-dev libxt-dev pkg-config texinfo locales-all ant hostname -y
 RUN java -version
-# RUN unset JAVA_TOOL_OPTIONS
+EXPOSE 9200
+RUN unset JAVA_TOOL_OPTIONS
 ENV LANG="en_US.UTF-8"
 ENV JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF8"
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64      
@@ -19,16 +20,16 @@ RUN unzip -d /opt/gradle /opt/gradle/gradle-3.3-bin
 ENV PATH=$PATH:/opt/gradle/gradle-3.3/bin
 RUN gradle -v
 RUN cd /root && git clone https://github.com/java-native-access/jna.git && cd jna && ant
-RUN cd /root/elasticsearch-6.0.0 && gradle assemble --no-daemon
+RUN cd /root/elasticsearch-6.0.0 && gradle assemble
 RUN pwd
 RUN tar -C /usr/share/ -xf  /root/elasticsearch-6.0.0/distribution/tar/build/distributions/elasticsearch-6.0.0-SNAPSHOT.tar.gz
 RUN mv /usr/share/elasticsearch-6.0.0-SNAPSHOT /usr/share/elasticsearch
 RUN useradd -ms /bin/bash mark43
 RUN chown mark43:mark43 -R /usr/share/elasticsearch
-# USER mark43
+USER mark43
 RUN /usr/share/elasticsearch/bin/elasticsearch --version
-# WORKDIR /home/mark43
-# RUN ls -al
+#WORKDIR /home/mark43
+#RUN ls -al
 RUN /usr/share/elasticsearch/bin/elasticsearch -d
-EXPOSE 9200
+
 
